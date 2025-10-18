@@ -1,0 +1,5 @@
+{
+  "name": "Barra de Navegación Animada",
+  "description": "Una aplicación de demostración que muestra una barra de navegación inferior animada, construida con React, TypeScript y Framer Motion, siguiendo un diseño moderno y enfocado en la experiencia de usuario móvil.",
+  "requestFramePermissions": []
+}
