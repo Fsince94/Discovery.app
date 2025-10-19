@@ -1,103 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { springTransition, tapAnimation } from '../../utils/animations';
 
-// --- Iconos --- //
+// --- Icono de Búsqueda --- //
 const SearchIcon: React.FC<{ className?: string }> = ({ className }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
 );
-  
+
+const searchBarVariants: Variants = {
+    closed: {
+        width: '4rem',
+        transition: { ...springTransition, damping: 30 }
+    },
+    open: {
+        // 💡 Responsive Fix: El ancho ahora es 100% para adaptarse a cualquier pantalla.
+        width: '100%',
+        transition: { ...springTransition, damping: 30 }
+    }
+};
+
+const searchInputVariants: Variants = {
+    hidden: { opacity: 0, x: -10 },
+    // 💡 El input aparece un poco después de que la barra empieza a expandirse.
+    visible: { opacity: 1, x: 0, transition: { delay: 0.25, duration: 0.3 } },
+    exit: { opacity: 0 }
+};
+
 interface SearchBarProps {
     isSearching: boolean;
     onOpen: () => void;
 }
 
 /**
- * ⚙️ Componente de Barra de Búsqueda (Controlado).
- * 💡 SOLID Insight: Este componente ya no gestiona su propio estado de apertura.
- * Recibe el estado (`isSearching`) y las funciones para cambiarlo (`onOpen`, `onClose`)
- * desde su padre. Esto lo hace más predecible y reutilizable.
+ * ⚙️ Componente de la Barra de Búsqueda.
+ * 💡 SOLID Insight: Este componente tiene la única responsabilidad (SRP) de gestionar
+ * la UI y las interacciones de la barra de búsqueda.
  */
 const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
-    // 💡 Estado local para controlar la visibilidad del icono de búsqueda *interno*.
-    // Esto permite que el icono desaparezca después de la animación principal para una UI más limpia.
-    const [showInternalIcon, setShowInternalIcon] = useState(true);
-
-    useEffect(() => {
-        if (isSearching) {
-            // Aseguramos que el icono sea visible al inicio de la animación de búsqueda.
-            setShowInternalIcon(true);
-            
-            // Programamos la desaparición del icono para *después* de que la barra se haya expandido.
-            const timer = setTimeout(() => {
-                setShowInternalIcon(false);
-            }, 600); // Retraso ajustado para que coincida con la animación de expansión.
-
-            // Limpieza del temporizador si el componente se desmonta o el estado cambia.
-            return () => clearTimeout(timer);
-        } else {
-            // Reseteamos el estado del icono cuando la búsqueda se cierra.
-            setShowInternalIcon(true);
-        }
-    }, [isSearching]);
-
     return (
-        <motion.div 
+        <motion.div
             layout
-            transition={springTransition}
-            // 💡 Se añade estilo para modo oscuro y se ajusta el posicionamiento.
-            // Cuando NO está buscando, se usa `left-[4.5rem]` para dejar espacio al ActionMenu.
-            className={`absolute top-0 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex items-center shadow-md transition-colors duration-300 ${isSearching ? 'left-0 w-full pl-20 pr-4' : 'left-[4.5rem] w-80 pr-4 pl-4 justify-end'}`}
+            onClick={!isSearching ? onOpen : undefined}
+            variants={searchBarVariants}
+            initial="closed"
+            animate={isSearching ? 'open' : 'closed'}
+            className="absolute right-0 w-16 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center p-4 shadow-md cursor-pointer transition-colors duration-300"
         >
-            <AnimatePresence mode="wait">
-                {isSearching ? (
-                     <motion.div 
-                        key="searching-ui"
-                        className="w-full flex items-center gap-3"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1, transition: { delay: 0.2 }}}
-                        exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                    >
-                        <AnimatePresence>
-                            {showInternalIcon && (
-                                <motion.div
-                                    initial={{ opacity: 0, width: 0 }}
-                                    animate={{ opacity: 1, width: '2rem', transition: { delay: 0.2 } }}
-                                    exit={{ opacity: 0, width: 0, transition: { duration: 0.3 } }}
-                                    className="flex-shrink-0"
-                                >
-                                    <SearchIcon className="w-8 h-8 text-white" />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                        
-                        <input
+            <div className="relative w-full h-full flex items-center justify-center">
+                {/* 
+                  💡 Animación del Icono:
+                  Este icono se anima para "correrse a la izquierda" y desvanecerse
+                  cuando la búsqueda se activa.
+                */}
+                <motion.div
+                    animate={{
+                        opacity: isSearching ? 0 : 1,
+                        x: isSearching ? -20 : 0,
+                    }}
+                    transition={{
+                        duration: 0.4,
+                        delay: isSearching ? 0.1 : 0,
+                    }}
+                    whileTap={!isSearching ? tapAnimation : {}}
+                    className="absolute" // Se posiciona absoluto para no afectar al input
+                >
+                    <SearchIcon className="w-8 h-8 text-white" />
+                </motion.div>
+                
+                <AnimatePresence>
+                    {isSearching && (
+                        <motion.input
+                            key="search-input"
+                            variants={searchInputVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
                             type="text"
-                            placeholder="Busca lo que necesites..."
-                            // Se añade estilo de texto y placeholder para modo oscuro
-                            className="flex-grow bg-transparent text-white dark:text-gray-100 placeholder-white/70 dark:placeholder-gray-300/70 focus:outline-none text-lg"
+                            placeholder="Buscar contenido..."
+                            // El padding izquierdo (pl-12) deja espacio para el icono que se desvanece
+                            className="w-full h-full bg-transparent text-white placeholder-gray-200 dark:placeholder-gray-400 text-lg focus:outline-none pl-12 pr-4"
                             autoFocus
                         />
-                    </motion.div>
-                ) : (
-                     <motion.button 
-                        key="search-button"
-                        aria-label="Buscar" 
-                        // Se añade estilo de hover para modo oscuro
-                        className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300" 
-                        whileTap={tapAnimation}
-                        onClick={onOpen}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                    >
-                      <SearchIcon className="w-full h-full" />
-                    </motion.button>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>
+            </div>
         </motion.div>
     );
 };

@@ -2,32 +2,40 @@ import React from 'react';
 import ViewContainer from '../ViewContainer';
 import ThemeToggler from '../ThemeToggler';
 
+/**
+ * 🧩 Componente para la vista de "Configuración".
+ * 💡 SOLID Insight: Este componente sigue el SRP (Single Responsibility Principle).
+ * Su única tarea es componer y mostrar las opciones de configuración disponibles,
+ * como el conmutador de tema, en un layout de galería.
+ */
 const SettingsView: React.FC = () => {
   return (
     <ViewContainer>
-      {/* 🧩 Contenedor principal para alinear el contenido a la izquierda y permitir el crecimiento vertical */}
-      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="text-left">
-          <h1 className="text-5xl font-bold mb-4">Configuración</h1>
-          <p className="text-xl max-w-2xl mb-12">
-            Gestiona las preferencias de tu cuenta, notificaciones y más.
-          </p>
+      {/* Contenedor del Título y Descripción */}
+      <div className="w-full max-w-2xl text-center sm:text-left mb-8 px-4">
+        <h1 className="text-4xl font-bold mb-4">Configuración</h1>
+        <p className="text-lg text-gray-200 dark:text-gray-400">
+          Personaliza tu experiencia. Aquí puedes ajustar las preferencias de la aplicación.
+        </p>
+      </div>
+      
+      {/* Galería de Tarjetas de Configuración */}
+      <div className="w-full max-w-2xl flex flex-row flex-wrap justify-center sm:justify-start gap-8 px-4">
+        {/* ⚙️ Tarjeta 1: Conmutador de Tema */}
+        <ThemeToggler />
+
+        {/*  futura Tarjeta 2: Marcador de posición */}
+        <div className="w-24 h-40 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-gray-400/50 flex items-center justify-center transition-colors duration-300">
+            <span className="text-gray-400 dark:text-gray-500 text-xs text-center p-2">
+                Próxima Novedad
+            </span>
         </div>
         
-        {/* 🖼️ Galería de tarjetas. Usamos flexbox con wrap para que se adapte a diferentes tamaños de pantalla. */}
-        <div className="flex flex-row flex-wrap justify-center sm:justify-start gap-8">
-          {/* Tarjeta 1: Selector de Tema */}
-          <ThemeToggler />
-          
-          {/* 💡 Tarjetas de marcador de posición para futuras funcionalidades. */}
-          {/* Se calculó el espacio para que quepan 3 tarjetas en fila en pantallas medianas y grandes. */}
-          <div className="w-24 h-40 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-gray-400 dark:border-gray-500 flex items-center justify-center transition-colors duration-300">
-            <span className="text-xs text-center text-gray-500 dark:text-gray-400 p-2">Próxima Novedad</span>
-          </div>
-          
-          <div className="w-24 h-40 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-gray-400 dark:border-gray-500 flex items-center justify-center transition-colors duration-300">
-            <span className="text-xs text-center text-gray-500 dark:text-gray-400 p-2">Otra Novedad</span>
-          </div>
+        {/* futura Tarjeta 3: Marcador de posición */}
+        <div className="w-24 h-40 bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-gray-400/50 flex items-center justify-center transition-colors duration-300">
+            <span className="text-gray-400 dark:text-gray-500 text-xs text-center p-2">
+                Próxima Novedad
+            </span>
         </div>
       </div>
     </ViewContainer>
