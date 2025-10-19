@@ -118,7 +118,7 @@ const DiscoveryView: React.FC = () => {
               </div>
             </motion.nav>
             <motion.div 
-              className="text-white text-center"
+              className="text-white dark:text-gray-100 text-center"
               animate={{ opacity: isSearching ? 0 : 1, y: isSearching ? 20 : 0 }}
               transition={{ ...springTransition, damping: 30, delay: isSearching ? 0 : 0.15 }}
             >

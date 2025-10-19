@@ -48,9 +48,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
         <motion.div 
             layout
             transition={springTransition}
-            // 💡 Se ajusta el `padding-left` a pl-20 cuando la búsqueda está activa
-            // para dejar espacio al nuevo botón de "Volver" externo.
-            className={`absolute top-0 h-16 bg-white/20 backdrop-blur-lg rounded-full flex items-center shadow-md ${isSearching ? 'left-0 w-full pl-20 pr-4' : 'left-0 w-80 pr-4 pl-4 justify-end'}`}
+            // 💡 Se añade estilo para modo oscuro y se ajusta el posicionamiento.
+            // Cuando NO está buscando, se usa `left-[4.5rem]` para dejar espacio al ActionMenu.
+            className={`absolute top-0 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex items-center shadow-md transition-colors duration-300 ${isSearching ? 'left-0 w-full pl-20 pr-4' : 'left-[4.5rem] w-80 pr-4 pl-4 justify-end'}`}
         >
             <AnimatePresence mode="wait">
                 {isSearching ? (
@@ -77,7 +77,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
                         <input
                             type="text"
                             placeholder="Busca lo que necesites..."
-                            className="flex-grow bg-transparent text-white placeholder-white/70 focus:outline-none text-lg"
+                            // Se añade estilo de texto y placeholder para modo oscuro
+                            className="flex-grow bg-transparent text-white dark:text-gray-100 placeholder-white/70 dark:placeholder-gray-300/70 focus:outline-none text-lg"
                             autoFocus
                         />
                     </motion.div>
@@ -85,7 +86,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
                      <motion.button 
                         key="search-button"
                         aria-label="Buscar" 
-                        className="w-10 h-10 text-white hover:text-teal-200" 
+                        // Se añade estilo de hover para modo oscuro
+                        className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300" 
                         whileTap={tapAnimation}
                         onClick={onOpen}
                         initial={{ opacity: 0 }}

@@ -32,7 +32,8 @@ interface BottomNavBarProps {
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) => {
   return (
     <footer className="w-full flex justify-center p-4">
-      <div className="relative w-full max-w-sm h-16 bg-white/90 backdrop-blur-sm rounded-3xl flex items-center justify-around shadow-lg mt-8">
+      {/* Se añaden estilos para modo oscuro */}
+      <div className="relative w-full max-w-sm h-16 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl flex items-center justify-around shadow-lg mt-8 transition-colors duration-300">
         {navItems.map((item) => {
           const isActive = activeView === item.id;
           return (
@@ -48,7 +49,8 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) =
                 {isActive && (
                   <motion.div
                     layoutId="active-background"
-                    className="absolute inset-0 bg-teal-400 rounded-full"
+                    // Se añade gradiente para modo oscuro que coincide con el fondo de la app.
+                    className="absolute inset-0 bg-gradient-to-br from-teal-300 to-cyan-400 dark:from-gray-800 dark:to-slate-900 bg-fixed rounded-full"
                     transition={springTransition}
                   />
                 )}
@@ -58,8 +60,9 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) =
                   transition={springTransition}
                 >
                   <item.icon
+                    // Se actualizan los colores de los íconos para modo oscuro
                     className={`w-7 h-7 transition-colors duration-200 ${
-                      isActive ? 'text-white' : 'text-gray-400'
+                      isActive ? 'text-white' : 'text-gray-400 dark:text-gray-500'
                     }`}
                   />
                 </motion.div>
@@ -68,7 +71,8 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) =
               {/* Muestra el texto "Discovery" solo si el ícono de perfil está activo */}
               {isActive && item.id === 'profile' && (
                 <motion.span
-                  className="absolute bottom-1 text-xs font-bold text-teal-600"
+                  // Se actualiza el color del texto para modo oscuro
+                  className="absolute bottom-1 text-xs font-bold text-teal-600 dark:text-teal-300"
                   initial={{ opacity: 0, y: '0.3125rem' }} 
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: 0.15 }}
@@ -79,7 +83,8 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) =
             </div>
           );
         })}
-        <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full" />
+        {/* Se actualiza el color de la barra inferior para modo oscuro */}
+        <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
       </div>
     </footer>
   );

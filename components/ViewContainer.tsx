@@ -33,7 +33,7 @@ interface ViewContainerProps {
 const ViewContainer: React.FC<ViewContainerProps> = ({ children }) => {
   return (
     <motion.div
-      className="w-full h-full flex-grow flex flex-col items-center justify-center text-center p-4 text-white"
+      className="w-full h-full flex-grow flex flex-col items-center justify-center text-center p-4 text-white dark:text-gray-100"
       variants={viewVariants}
       initial="hidden"
       animate="visible"

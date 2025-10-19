@@ -11,10 +11,11 @@ export const LoadingSpinner: React.FC<{ className?: string }> = ({ className }) 
   return (
     <div className="flex justify-center items-center">
       <motion.div
-        className={`w-12 h-12 border-4 border-white border-t-teal-500 rounded-full ${className}`}
+        className={`w-12 h-12 border-4 border-white dark:border-gray-300 border-t-teal-500 dark:border-t-cyan-500 rounded-full ${className}`}
         animate={{ rotate: 360 }}
         transition={{
-          loop: Infinity,
+          // FIX: Corrected property 'loop' to 'repeat' for infinite animation as per Framer Motion API.
+          repeat: Infinity,
           ease: "linear",
           duration: 1,
         }}

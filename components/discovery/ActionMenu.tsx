@@ -82,11 +82,11 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ onNavigate, isSearchActive }) =
             <motion.div 
                 layout 
                 transition={springTransition}
-                className="w-16 bg-white/20 backdrop-blur-lg rounded-full flex flex-col items-center p-4 gap-4 shadow-md"
+                className="w-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex flex-col items-center p-4 gap-4 shadow-md transition-colors duration-300"
             >
                 <motion.button 
                     aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-                    className="w-10 h-10 text-white hover:text-teal-200 flex-shrink-0" 
+                    className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 flex-shrink-0" 
                     whileTap={tapAnimation}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     animate={{ rotate: isMenuOpen ? 45 : 0 }}
@@ -109,7 +109,7 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ onNavigate, isSearchActive }) =
                             <motion.button
                                 aria-label={item.label}
                                 onClick={() => handleItemClick(item.id)}
-                                className="w-10 h-10 text-white hover:text-teal-200 focus:outline-none"
+                                className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 focus:outline-none"
                                 whileTap={tapAnimation}
                             >
                                 <item.icon className="w-full h-full" />

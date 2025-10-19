@@ -35,13 +35,14 @@ interface SubViewLayoutProps {
 const SubViewLayout: React.FC<SubViewLayoutProps> = ({ title, onBack, children }) => {
   return (
     <motion.div
-      className="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-300 to-cyan-400 flex flex-col z-10"
+      // Se añade fondo para modo oscuro y transición de color
+      className="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-300 to-cyan-400 dark:from-gray-800 dark:to-slate-900 flex flex-col z-10 transition-colors duration-500"
       variants={subViewVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
     >
-      <header className="flex items-center p-4 flex-shrink-0 text-white">
+      <header className="flex items-center p-4 flex-shrink-0 text-white dark:text-gray-100">
         <motion.button
           onClick={onBack}
           className="p-2 rounded-full hover:bg-white/20 transition-colors"
@@ -52,7 +53,7 @@ const SubViewLayout: React.FC<SubViewLayoutProps> = ({ title, onBack, children }
         </motion.button>
         <h2 className="text-xl font-bold ml-4">{title}</h2>
       </header>
-      <main className="flex-grow p-6 overflow-y-auto text-white flex flex-col items-center text-center">
+      <main className="flex-grow p-6 overflow-y-auto text-white dark:text-gray-100 flex flex-col items-center text-center">
         {children}
       </main>
     </motion.div>
