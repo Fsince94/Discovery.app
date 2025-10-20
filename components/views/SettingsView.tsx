@@ -1,14 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, type Variants, AnimatePresence } from 'framer-motion';
-import ThemeToggler from '../ThemeToggler';
 import { useTheme } from '../../context/ThemeContext';
-import ProfileView from './ProfileView'; // 💡 Importar la nueva sub-vista
-import Header from '../layout/Header'; // 💡 Importar el componente de cabecera
-import { ProfileBrainIcon } from '../icons/ProfileBrainIcon';
+import ProfileView from './ProfileView';
+import ThemeSettingsView from './ThemeSettingsView';
+import SubViewLayout from '../layout/SubViewLayout'; // 💡 Se usa SubViewLayout
+import { useNavigation } from '../../context/NavigationContext'; // 💡 Importar hook de navegación
 
-// 💡 Se definen variantes de animación locales para mantener la consistencia
-// con el resto de la app, pero permitiendo un layout de altura completa.
 const viewVariants: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
   visible: { 
@@ -25,43 +23,32 @@ const viewVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1 }
+  visible: { opacity: 1, scale: 1 },
+  hover: { scale: 1.05, y: -5 },
+  tap: { scale: 0.95 }
 };
-
-interface SettingsViewProps {
-  onBackToDiscovery: () => void;
-}
 
 /**
  * 🧩 Componente para la vista de "Configuración".
- * 💡 SOLID Insight: Este componente ahora actúa como un "controlador de navegación"
- * para sus sub-vistas (SRP), gestionando qué vista mostrar. Sigue siendo extensible (OCP)
- * para añadir más sub-vistas en el futuro.
+ * 💡 SOLID Insight: Este componente ahora usa `useNavigation` (DIP) y actúa como un
+ * enrutador para sus propias sub-vistas, manteniendo su responsabilidad (SRP) de
+ * gestionar la configuración, pero delegando la navegación al contexto.
  */
-const SettingsView: React.FC<SettingsViewProps> = ({ onBackToDiscovery }) => {
-  const { theme } = useTheme();
-  const [activeSubView, setActiveSubView] = useState<string | null>(null);
-
-  // --- Manejadores para la navegación a sub-vistas --- //
-  const handleNavigate = (subViewId: string) => setActiveSubView(subViewId);
-  const handleBack = () => setActiveSubView(null);
+const SettingsView: React.FC = () => {
+  const { currentView, navigate } = useNavigation();
 
   const renderSubView = () => {
-    switch (activeSubView) {
-      case 'profile':
-        return (
-          <ProfileView 
-            key="profile" 
-            onBack={handleBack} 
-            onBackToDiscovery={onBackToDiscovery} 
-          />
-        );
+    switch (currentView) {
+      // 💡 Se pasa el `key` para que AnimatePresence detecte el cambio de componente.
+      case 'user-profile':
+        return <ProfileView key="user-profile" />;
+      case 'theme':
+        return <ThemeSettingsView key="theme" />;
       default:
         return null;
     }
   };
 
-  // 🧩 Componente de marcador de posición para celdas vacías de la cuadrícula.
   const PlaceholderCard = () => (
     <div className="w-full h-full bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-gray-400/50 flex items-center justify-center transition-colors duration-300 p-2">
       <span className="text-gray-400 dark:text-gray-500 text-xs text-center">
@@ -69,11 +56,22 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBackToDiscovery }) => {
       </span>
     </div>
   );
+  
+  const ThemePreviewCard: React.FC = () => {
+    const { theme } = useTheme();
+    return (
+      <div className="w-full h-full bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl flex items-center justify-center p-2 transition-colors duration-300">
+        <span className="text-gray-600 dark:text-gray-300 font-medium capitalize">
+          {theme === 'light' ? 'Claro' : 'Oscuro'}
+        </span>
+      </div>
+    );
+  };
 
-  // ⚙️ Estructura de datos para la cuadrícula 3x3. Facilita la gestión de cada celda.
+  // 💡 Se actualiza 'profile' a 'user-profile' para coincidir con `routes.ts`.
   const gridItems = [
-    { id: 'theme', label: 'Tema', component: ThemeToggler },
-    { id: 'profile', label: 'Perfil', component: PlaceholderCard },
+    { id: 'theme', label: 'Tema', component: ThemePreviewCard },
+    { id: 'user-profile', label: 'Perfil', component: PlaceholderCard },
     { id: 'security', label: 'Seguridad', component: PlaceholderCard },
     { id: 'data', label: 'Datos', component: PlaceholderCard },
     { id: 'language', label: 'Idioma', component: PlaceholderCard },
@@ -83,59 +81,47 @@ const SettingsView: React.FC<SettingsViewProps> = ({ onBackToDiscovery }) => {
     { id: 'legal', label: 'Legal', component: PlaceholderCard },
   ];
 
+  const isSubViewActive = ['user-profile', 'theme'].includes(currentView);
 
   return (
-    // 💡 AnimatePresence gestiona la transición entre la cuadrícula y la sub-vista.
     <AnimatePresence mode="wait">
-      {activeSubView === null ? (
-        <motion.div
-          key="settings-main"
-          className="w-full h-full flex flex-col"
-          variants={viewVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          {/* 💡 Esta vista ahora gestiona su propia cabecera con un ícono. */}
-          <Header
-            parent={{
-              label: 'Discovery',
-              icon: ProfileBrainIcon,
-              onBack: onBackToDiscovery,
-            }}
-            currentTitle="Configuración"
-          />
-
-          <div className="w-full max-w-md mx-auto grid grid-cols-3 grid-rows-3 gap-4 flex-grow px-4 pb-4">
-            {gridItems.map((item) => (
-              <motion.div 
-                key={item.id} 
-                variants={itemVariants} 
-                className="w-full h-full"
-                // ⚙️ Se añade el evento onClick solo a la tarjeta de perfil.
-                onClick={item.id === 'profile' ? () => handleNavigate('profile') : undefined}
-                whileTap={item.id === 'profile' ? { scale: 0.95 } : {}}
-              >
-                {/* ⚙️ Se añade `cursor-pointer` para dar feedback visual de que es clickeable. */}
-                <div className={`w-full h-full flex flex-col items-center ${item.id === 'profile' ? 'cursor-pointer' : ''}`}>
-                  <div className="h-12 flex-shrink-0 flex flex-col items-center justify-center text-center">
-                    <h3 className="text-sm font-bold text-white/90 dark:text-gray-200/90 capitalize">
-                      {item.label}
-                    </h3>
-                    {item.id === 'theme' && (
-                      <p className="text-xs text-white/70 dark:text-gray-400/80">
-                        {theme === 'light' ? 'Claro' : 'Oscuro'}
-                      </p>
-                    )}
+      {!isSubViewActive ? (
+        // 💡 Se envuelve la vista principal en SubViewLayout para obtener la cabecera
+        // y la animación de forma consistente.
+        <SubViewLayout key="settings-main">
+          <motion.div
+            className="w-full max-w-md mx-auto grid grid-cols-3 grid-rows-3 gap-4 flex-grow"
+            variants={viewVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {gridItems.map((item) => {
+              const isClickable = item.id === 'user-profile' || item.id === 'theme';
+              return (
+                <motion.div 
+                  key={item.id} 
+                  variants={itemVariants}
+                  whileHover={isClickable ? "hover" : ""}
+                  whileTap={isClickable ? "tap" : ""}
+                  className="w-full h-full"
+                  onClick={isClickable ? () => navigate(item.id) : undefined}
+                >
+                  <div className={`w-full h-full flex flex-col items-center ${isClickable ? 'cursor-pointer' : ''}`}>
+                    <div className="h-12 flex-shrink-0 flex flex-col items-center justify-center text-center">
+                      <h3 className="text-sm font-bold text-white/90 dark:text-gray-200/90 capitalize">
+                        {item.label}
+                      </h3>
+                    </div>
+                    <div className="w-full flex-grow">
+                      <item.component />
+                    </div>
                   </div>
-                  <div className="w-full flex-grow">
-                    <item.component />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+                </motion.div>
+              )
+            })}
+          </motion.div>
+        </SubViewLayout>
       ) : (
         renderSubView()
       )}

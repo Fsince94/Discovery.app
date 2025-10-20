@@ -2,14 +2,6 @@
 import React from 'react';
 import { motion, type Variants } from 'framer-motion';
 import SubViewLayout from '../layout/SubViewLayout';
-import { type BreadcrumbItem } from '../../types';
-import { ProfileBrainIcon } from '../icons/ProfileBrainIcon';
-import { SettingsIcon } from '../icons/SettingsIcon';
-
-interface ProfileViewProps {
-  onBack: () => void;
-  onBackToDiscovery: () => void;
-}
 
 // 💡 Reutilizamos las variantes de animación para mantener consistencia visual.
 const itemVariants: Variants = {
@@ -28,7 +20,6 @@ const profileItems = [
 
 /**
  * 🧩 Componente de marcador de posición, similar al de SettingsView.
- * Representa una funcionalidad futura o no implementada.
  */
 const PlaceholderCard: React.FC = () => (
   <div className="w-full h-full bg-white/10 dark:bg-gray-700/50 rounded-2xl border-2 border-dashed border-white/20 dark:border-gray-400/50 flex items-center justify-center transition-colors duration-300 p-2">
@@ -41,22 +32,17 @@ const PlaceholderCard: React.FC = () => (
 /**
  * 🧩 Vista para la configuración del Perfil.
  * 💡 SOLID Insight: Sigue el SRP. Su única responsabilidad es mostrar las opciones
- * de perfil del usuario. Delega el layout y la navegación hacia atrás al componente
- * reutilizable `SubViewLayout`, promoviendo la composición.
+ * de perfil. Delega el layout y la navegación al `SubViewLayout`, que ahora
+ * obtiene toda la información necesaria del `NavigationContext`.
  */
-const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onBackToDiscovery }) => {
+const ProfileView: React.FC = () => {
   
-  // ⚙️ Se construye el array de breadcrumbs con íconos para pasarlo al layout.
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Discovery', onClick: onBackToDiscovery, icon: ProfileBrainIcon },
-    { label: 'Configuración', onClick: onBack, icon: SettingsIcon },
-    { label: 'Perfil' }, // El último elemento no es clickeable y es solo texto.
-  ];
-  
+  // 🗑️ La construcción de breadcrumbs y la recepción de props de navegación
+  //    han sido eliminadas para simplificar el componente.
+
   return (
-    // ⚙️ Se utiliza SubViewLayout para obtener la animación de entrada/salida y la cabecera
-    //    con el breadcrumb, ahora pasando la ruta de navegación completa.
-    <SubViewLayout breadcrumbs={breadcrumbs}>
+    // ⚙️ Se utiliza SubViewLayout, que ahora genera los breadcrumbs automáticamente.
+    <SubViewLayout>
       <motion.div 
         className="w-full max-w-md mx-auto grid grid-cols-2 grid-rows-3 gap-4 flex-grow"
         initial="hidden"

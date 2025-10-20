@@ -3,27 +3,26 @@ import React, { useState } from 'react';
 // FIX: Separated the `Variants` type import to resolve type resolution errors.
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { springTransition } from '../../utils/animations';
 
 import ChatView from './ChatView';
 import ConsultingView from './ConsultingView';
 import BlogView from './BlogView';
+import { useNavigation } from '../../context/NavigationContext';
 
 // --- Nuevos componentes desacoplados --- //
 import SearchBar from '../discovery/SearchBar';
-import ActionMenu from '../discovery/ActionMenu';
+import Toolbar from '../discovery/Toolbar';
 import BackButton from '../BackButton';
-import DiscoverySwitch from '../discovery/DiscoverySwitch'; // Import the new component
+import DiscoverySwitch from '../discovery/DiscoverySwitch';
 
 /**
  * 🧩 Componente para la vista "Discovery".
- * 💡 SOLID Insight: Tras la refactorización, este componente ahora actúa como un "orquestador".
- * Su responsabilidad principal (SRP) es componer los elementos de la UI (SearchBar, ActionMenu)
- * y gestionar la navegación entre sus sub-vistas. La lógica interna de la búsqueda y el menú
- * de acciones ha sido delegada, resultando en un componente mucho más limpio y mantenible.
+ * 💡 SOLID Insight: Este componente ahora usa el hook `useNavigation` (DIP) para
+ * navegar a sus sub-vistas. Su responsabilidad (SRP) sigue siendo orquestar la UI
+ * de Discovery, pero la lógica de navegación está ahora centralizada y desacoplada.
  */
 const DiscoveryView: React.FC = () => {
-  const [activeSubView, setActiveSubView] = useState<string | null>(null);
+  const { currentView, navigate } = useNavigation();
   const [isSearching, setIsSearching] = useState(false);
   const [activeTab, setActiveTab] = useState<'discovery' | 'artifacts'>('discovery');
 
@@ -43,23 +42,16 @@ const DiscoveryView: React.FC = () => {
     exit: { opacity: 0, y: -15, transition: { duration: 0.2 } }
   };
 
-  const handleNavigate = (subViewId: string) => {
-    // 💡 Se introduce un pequeño retardo para asegurar que la animación de cierre del menú
-    // sea perceptible antes de que la vista principal comience su transición de salida.
+  const handleToolbarNavigate = (subViewId: string) => {
     setTimeout(() => {
-      setActiveSubView(subViewId);
+      navigate(subViewId);
     }, 200);
   };
   
-  const handleBack = () => {
-    setActiveSubView(null);
-  };
-
   // --- Manejadores para el estado de búsqueda --- //
   const handleOpenSearch = () => setIsSearching(true);
   const handleCloseSearch = () => setIsSearching(false);
   
-  // ⚙️ Al cambiar de pestaña, se cierra la búsqueda si está abierta para una mejor UX.
   const handleTabChange = (tab: 'discovery' | 'artifacts') => {
     if (tab === 'artifacts' && isSearching) {
       setIsSearching(false);
@@ -68,33 +60,34 @@ const DiscoveryView: React.FC = () => {
   };
 
   const renderSubView = () => {
-    switch (activeSubView) {
+    switch (currentView) {
+      // 💡 Las vistas ya no necesitan el prop `onBack`. SubViewLayout lo gestiona.
       case 'chat':
-        return <ChatView key="chat" onBack={handleBack} />;
+        return <ChatView key="chat" />;
       case 'consulting':
-        return <ConsultingView key="consulting" onBack={handleBack} />;
+        return <ConsultingView key="consulting" />;
       case 'blog':
-        return <BlogView key="blog" onBack={handleBack} />;
+        return <BlogView key="blog" />;
       default:
         return null;
     }
   };
 
+  // 💡 Se determina si se debe mostrar la vista principal o una sub-vista.
+  const isSubViewActive = ['chat', 'consulting', 'blog'].includes(currentView);
+
   return (
     <div className="w-full h-full flex-grow">
       <AnimatePresence mode="wait">
-        {activeSubView === null ? (
+        {!isSubViewActive ? (
           <motion.div
             key="discovery-main"
-            // 💡 Se elimina el título y se sube el contenido añadiendo padding superior.
-            className="relative w-full h-full flex-grow flex flex-col pt-8"
+            className="relative w-full h-full flex-grow flex flex-col"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            {/* ⚙️ Contenedor de Controles (Switch y Barra de Búsqueda) */}
-            {/* 💡 Se elimina el margen superior para que se posicione más arriba. */}
             <div className="w-full max-w-lg mx-auto px-4 sm:px-0">
               <DiscoverySwitch activeTab={activeTab} onTabChange={handleTabChange} />
               
@@ -102,10 +95,8 @@ const DiscoveryView: React.FC = () => {
                 {activeTab === 'discovery' && (
                   <motion.div
                     key="searchbar-container"
-                    // ⚙️ Centrado: Se añade flex y justify-center para centrar la barra.
                     className="relative w-full flex justify-center"
                     initial={{ opacity: 0, height: 0, marginTop: '0rem' }}
-                    // ⚙️ Separación mínima: Se reduce el margen superior a 0.5rem.
                     animate={{ opacity: 1, height: '4rem', marginTop: '0.5rem' }}
                     exit={{ opacity: 0, height: 0, marginTop: '0rem' }}
                     transition={{ duration: 0.3, ease: 'easeInOut' }}
@@ -130,7 +121,6 @@ const DiscoveryView: React.FC = () => {
               </AnimatePresence>
             </div>
             
-            {/* ⚙️ Contenido de las Pestañas */}
             <main className="w-full flex-grow flex flex-col items-center justify-center relative mt-4">
               <AnimatePresence mode="wait">
                 {activeTab === 'discovery' ? (
@@ -156,7 +146,7 @@ const DiscoveryView: React.FC = () => {
                     animate="visible"
                     exit="exit"
                   >
-                    <ActionMenu onNavigate={handleNavigate} />
+                    <Toolbar onNavigate={handleToolbarNavigate} />
                     <p className="text-white/80 mt-8 max-w-md">
                       Gestiona tus artefactos y accede a acciones rápidas como el chat, consultoría o el blog.
                     </p>

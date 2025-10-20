@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ThemeProvider } from './context/ThemeContext';
+import { NavigationProvider } from './context/NavigationContext'; // 💡 Importar el nuevo provider
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -12,9 +13,11 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     {/* 💡 DIP (Dependency Inversion Principle): App y sus hijos ahora dependen de la abstracción
-        del ThemeProvider, no de una implementación concreta de manejo de temas. */}
+        del ThemeProvider y NavigationProvider, no de implementaciones concretas. */}
     <ThemeProvider>
-      <App />
+      <NavigationProvider>
+        <App />
+      </NavigationProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

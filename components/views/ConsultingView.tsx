@@ -2,40 +2,45 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SubViewLayout from '../layout/SubViewLayout';
-import { LoadingSpinner } from '../icons/LoadingSpinner';
-import { type BreadcrumbItem } from '../../types';
-import { ProfileBrainIcon } from '../icons/ProfileBrainIcon';
-
-interface ConsultingViewProps {
-  onBack: () => void;
-}
+import { SkeletonLoader } from '../ui/SkeletonLoader';
 
 const contentVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } },
     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
 };
 
-const ConsultingView: React.FC<ConsultingViewProps> = ({ onBack }) => {
+/**
+ * 🧩 Vista de Consultoría.
+ * 💡 SOLID Insight: Este componente ahora se adhiere perfectamente al SRP. Su única
+ * preocupación es renderizar el contenido de la vista de consultoría. El `NavigationContext`
+ * invierte las dependencias (DIP), liberando a este componente de responsabilidades de navegación.
+ */
+const ConsultingView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
-  // 💡 Simula la carga de datos. En una app real, aquí iría una llamada a API.
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1800); // Simula 1.8s de carga
-    return () => clearTimeout(timer); // Limpieza al desmontar
+    const timer = setTimeout(() => setIsLoading(false), 1800);
+    return () => clearTimeout(timer);
   }, []);
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Discovery', onClick: onBack, icon: ProfileBrainIcon },
-    { label: 'Consultoría' },
-  ];
+  // 🗑️ No más breadcrumbs manuales. ¡El contexto se encarga de todo!
 
   return (
-    <SubViewLayout breadcrumbs={breadcrumbs}>
+    <SubViewLayout>
       <AnimatePresence mode="wait">
         {isLoading ? (
-          <motion.div key="loader" variants={contentVariants} initial="hidden" animate="visible" exit="exit">
-            <LoadingSpinner />
+          <motion.div 
+            key="loader" 
+            variants={contentVariants} 
+            initial="hidden" 
+            animate="visible" 
+            exit="exit"
+            className="w-full max-w-md flex flex-col items-start gap-4"
+          >
+            <SkeletonLoader className="w-3/4 h-10" />
+            <SkeletonLoader className="w-full h-6" />
+            <SkeletonLoader className="w-5/6 h-6" />
           </motion.div>
         ) : (
           <motion.div key="content" variants={contentVariants} initial="hidden" animate="visible" exit="exit">

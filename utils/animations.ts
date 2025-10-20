@@ -1,17 +1,17 @@
-
 import { Transition } from 'framer-motion';
 
 /**
  * Configuración de transición de tipo "spring" (resorte).
- * Proporciona una animación elástica y fluida, ideal para el indicador
- * que se mueve entre los íconos de la barra de navegación.
- * - stiffness: Rigidez del resorte. Un valor más alto lo hace más rápido y brusco.
- * - damping: Amortiguación. Un valor más alto reduce la oscilación.
+ * 💡 UX Tweak: Se ha reducido la rigidez (stiffness) y la amortiguación (damping)
+ * para crear una animación más suave y "natural". Un resorte menos rígido
+ * se siente más orgánico y menos abrupto.
+ * - stiffness: Rigidez del resorte. Un valor más bajo lo hace más suave.
+ * - damping: Amortiguación. Un valor más bajo permite una ligera oscilación al final.
  */
 export const springTransition: Transition = {
   type: "spring",
-  stiffness: 500,
-  damping: 40,
+  stiffness: 380,
+  damping: 30,
 };
 
 /**
