@@ -22,7 +22,7 @@ const ThemeToggler: React.FC = () => {
 
   const Indicator = () => (
     <motion.div
-      className="absolute inset-0 w-12 h-12 bg-white dark:bg-black rounded-full z-0"
+      className="absolute inset-0 bg-white dark:bg-black rounded-full z-0"
       layoutId="theme-indicator"
       transition={springTransition}
     />
@@ -30,31 +30,38 @@ const ThemeToggler: React.FC = () => {
 
   return (
     <motion.div
-      className="relative w-24 h-40 bg-gray-200 dark:bg-gray-700 rounded-2xl p-3 flex flex-col items-center shadow-lg"
+      // 🎨 Se eliminó el tamaño fijo para que sea flexible y se adapte a la cuadrícula.
+      className="relative w-full h-full bg-gray-200 dark:bg-gray-700 rounded-2xl p-2 flex flex-col items-center shadow-lg"
       whileTap={{ scale: 0.95 }}
       aria-label="Selector de tema"
     >
-      <div className="w-full h-full flex flex-col items-center justify-around">
-        {/* Contenedor para el icono del Sol con su propio onClick */}
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        {/* Contenedor para el icono del Sol (50% de la altura) */}
         <div
           onClick={() => setTheme('light')}
-          className="relative w-12 h-12 flex items-center justify-center cursor-pointer"
+          className="w-full h-1/2 flex items-center justify-center cursor-pointer"
           role="button"
           aria-label="Cambiar a tema claro"
         >
-          {!isDark && <Indicator />}
-          <SunIcon className={`w-8 h-8 z-10 transition-colors duration-300 ${isDark ? 'text-gray-400' : 'text-yellow-500'}`} />
+          {/* Contenedor cuadrado para mantener la proporción y la animación */}
+          <div className="relative h-2/3 aspect-square flex items-center justify-center">
+            {!isDark && <Indicator />}
+            <SunIcon className={`w-full h-full p-2 z-10 transition-colors duration-300 ${isDark ? 'text-gray-400' : 'text-yellow-500'}`} />
+          </div>
         </div>
         
-        {/* Contenedor para el icono de la Luna con su propio onClick */}
+        {/* Contenedor para el icono de la Luna (50% de la altura) */}
         <div
           onClick={() => setTheme('dark')}
-          className="relative w-12 h-12 flex items-center justify-center cursor-pointer"
+          className="w-full h-1/2 flex items-center justify-center cursor-pointer"
           role="button"
           aria-label="Cambiar a tema oscuro"
         >
-          {isDark && <Indicator />}
-          <MoonIcon className={`w-8 h-8 z-10 transition-colors duration-300 ${isDark ? 'text-blue-400' : 'text-gray-400'}`} />
+          {/* Contenedor cuadrado para mantener la proporción y la animación */}
+          <div className="relative h-2/3 aspect-square flex items-center justify-center">
+            {isDark && <Indicator />}
+            <MoonIcon className={`w-full h-full p-2 z-10 transition-colors duration-300 ${isDark ? 'text-blue-400' : 'text-gray-400'}`} />
+          </div>
         </div>
       </div>
     </motion.div>

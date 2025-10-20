@@ -48,7 +48,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
             variants={searchBarVariants}
             initial="closed"
             animate={isSearching ? 'open' : 'closed'}
-            className="absolute right-0 w-16 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center p-4 shadow-md cursor-pointer transition-colors duration-300"
+            // ⚙️ Centrado: Se elimina la posición absoluta para que el contenedor padre la centre.
+            className="h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center p-4 shadow-md cursor-pointer transition-colors duration-300"
         >
             <div className="relative w-full h-full flex items-center justify-center">
                 {/* 
@@ -81,8 +82,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ isSearching, onOpen }) => {
                             exit="exit"
                             type="text"
                             placeholder="Buscar contenido..."
-                            // El padding izquierdo (pl-12) deja espacio para el icono que se desvanece
-                            className="w-full h-full bg-transparent text-white placeholder-gray-200 dark:placeholder-gray-400 text-lg focus:outline-none pl-12 pr-4"
+                            // 💡 El padding izquierdo (pl-16) deja espacio para el botón de 'Volver' (w-16).
+                            className="w-full h-full bg-transparent text-white placeholder-gray-200 dark:placeholder-gray-400 text-lg focus:outline-none pl-16 pr-4"
                             autoFocus
                         />
                     )}

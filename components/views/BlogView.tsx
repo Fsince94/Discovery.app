@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SubViewLayout from '../layout/SubViewLayout';
 import { LoadingSpinner } from '../icons/LoadingSpinner';
+import { type BreadcrumbItem } from '../../types';
+import { ProfileBrainIcon } from '../icons/ProfileBrainIcon';
 
 interface BlogViewProps {
   onBack: () => void;
@@ -22,8 +25,13 @@ const BlogView: React.FC<BlogViewProps> = ({ onBack }) => {
     return () => clearTimeout(timer); // Limpieza al desmontar
   }, []);
 
+  const breadcrumbs: BreadcrumbItem[] = [
+    { label: 'Discovery', onClick: onBack, icon: ProfileBrainIcon },
+    { label: 'Blog' },
+  ];
+
   return (
-    <SubViewLayout title="Blog" onBack={onBack}>
+    <SubViewLayout breadcrumbs={breadcrumbs}>
       <AnimatePresence mode="wait">
         {isLoading ? (
           <motion.div key="loader" variants={contentVariants} initial="hidden" animate="visible" exit="exit">

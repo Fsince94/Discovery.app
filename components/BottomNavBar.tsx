@@ -31,7 +31,10 @@ interface BottomNavBarProps {
  */
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeView, onNavigate }) => {
   return (
-    <footer className="w-full flex justify-center p-4">
+    // ⚙️ Se aplica posicionamiento fijo para mantener la barra siempre visible.
+    // `fixed bottom-0 left-0 right-0` la ancla en la parte inferior.
+    // `z-50` asegura que se muestre por encima de otro contenido.
+    <footer className="fixed bottom-0 left-0 right-0 w-full flex justify-center p-4 z-50">
       {/* Se añaden estilos para modo oscuro */}
       <div className="relative w-full max-w-sm h-16 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl flex items-center justify-around shadow-lg mt-8 transition-colors duration-300">
         {navItems.map((item) => {

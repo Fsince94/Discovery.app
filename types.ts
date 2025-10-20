@@ -11,3 +11,13 @@ export interface NavItem {
   label: string;
   icon: React.FC<{ className?: string }>;
 }
+
+/**
+ * 💡 ISP (Interface Segregation Principle): Una interfaz específica para los breadcrumbs,
+ * que ahora incluye un ícono opcional para una UI más compacta y visual.
+ */
+export interface BreadcrumbItem {
+  label: string;
+  onClick?: () => void;
+  icon?: React.FC<{ className?: string }>;
+}

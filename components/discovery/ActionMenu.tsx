@@ -56,7 +56,6 @@ const menuItemVariants: Variants = {
 
 interface ActionMenuProps {
     onNavigate: (viewId: string) => void;
-    isSearchActive: boolean;
 }
 
 /**
@@ -65,7 +64,7 @@ interface ActionMenuProps {
  * la apertura/cierre del menú de acciones y notificar al padre cuando se selecciona
  * un ítem. Es un componente altamente cohesivo y autónomo.
  */
-const ActionMenu: React.FC<ActionMenuProps> = ({ onNavigate, isSearchActive }) => {
+const ActionMenu: React.FC<ActionMenuProps> = ({ onNavigate }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleItemClick = (id: string) => {
@@ -75,51 +74,46 @@ const ActionMenu: React.FC<ActionMenuProps> = ({ onNavigate, isSearchActive }) =
 
     return (
         <motion.div 
-            className="absolute z-20"
-            animate={{ opacity: isSearchActive ? 0 : 1, x: isSearchActive ? -20 : 0 }}
-            transition={{ ...springTransition, damping: 30, delay: isSearchActive ? 0 : 0.15 }}
+            layout 
+            transition={springTransition}
+            className="w-16 h-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex flex-col items-center justify-center p-2 gap-4 shadow-md transition-colors duration-300"
         >
-            <motion.div 
-                layout 
+            <motion.button 
+                aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+                className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 flex-shrink-0" 
+                whileTap={tapAnimation}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                animate={{ rotate: isMenuOpen ? 45 : 0 }}
                 transition={springTransition}
-                className="w-16 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-full flex flex-col items-center p-4 gap-4 shadow-md transition-colors duration-300"
             >
-                <motion.button 
-                    aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-                    className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 flex-shrink-0" 
-                    whileTap={tapAnimation}
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    animate={{ rotate: isMenuOpen ? 45 : 0 }}
-                    transition={springTransition}
+                <PlusIcon className="w-full h-full" />
+            </motion.button>
+            
+            <AnimatePresence>
+                {isMenuOpen && (
+                <motion.div 
+                    // ⚙️ Se posiciona el menú desplegable de forma absoluta para que no empuje el layout.
+                    className="absolute top-20 flex flex-col items-center gap-5 p-4 bg-white/20 dark:bg-black/20 backdrop-blur-lg rounded-2xl"
+                    variants={menuContainerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
                 >
-                    <PlusIcon className="w-full h-full" />
-                </motion.button>
-                
-                <AnimatePresence>
-                    {isMenuOpen && (
-                    <motion.div 
-                        className="flex flex-col items-center gap-5"
-                        variants={menuContainerVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                    >
-                        {actionItems.map(item => (
-                            <motion.div key={item.id} className="relative flex flex-col items-center" variants={menuItemVariants}>
-                            <motion.button
-                                aria-label={item.label}
-                                onClick={() => handleItemClick(item.id)}
-                                className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 focus:outline-none"
-                                whileTap={tapAnimation}
-                            >
-                                <item.icon className="w-full h-full" />
-                            </motion.button>
-                            </motion.div>
-                        ))}
-                    </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+                    {actionItems.map(item => (
+                        <motion.div key={item.id} className="relative flex flex-col items-center" variants={menuItemVariants}>
+                        <motion.button
+                            aria-label={item.label}
+                            onClick={() => handleItemClick(item.id)}
+                            className="w-10 h-10 text-white hover:text-teal-200 dark:hover:text-cyan-300 focus:outline-none"
+                            whileTap={tapAnimation}
+                        >
+                            <item.icon className="w-full h-full" />
+                        </motion.button>
+                        </motion.div>
+                    ))}
+                </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

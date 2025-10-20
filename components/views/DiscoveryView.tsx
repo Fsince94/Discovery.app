@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 // FIX: Separated the `Variants` type import to resolve type resolution errors.
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
-import { springTransition, tapAnimation } from '../../utils/animations';
+import { springTransition } from '../../utils/animations';
 
 import ChatView from './ChatView';
 import ConsultingView from './ConsultingView';
@@ -11,7 +12,8 @@ import BlogView from './BlogView';
 // --- Nuevos componentes desacoplados --- //
 import SearchBar from '../discovery/SearchBar';
 import ActionMenu from '../discovery/ActionMenu';
-import { BackIcon } from '../icons/BackIcon';
+import BackButton from '../BackButton';
+import DiscoverySwitch from '../discovery/DiscoverySwitch'; // Import the new component
 
 /**
  * 🧩 Componente para la vista "Discovery".
@@ -23,6 +25,7 @@ import { BackIcon } from '../icons/BackIcon';
 const DiscoveryView: React.FC = () => {
   const [activeSubView, setActiveSubView] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [activeTab, setActiveTab] = useState<'discovery' | 'artifacts'>('discovery');
 
   const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.98 },
@@ -33,10 +36,11 @@ const DiscoveryView: React.FC = () => {
     },
     exit: { opacity: 0, scale: 0.98, transition: { duration: 0.2 } }
   };
-
-  const itemVariants: Variants = {
-    hidden: { y: '1.25rem', opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { ...springTransition, damping: 25, stiffness: 300 } }
+  
+  const tabContentVariants: Variants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    exit: { opacity: 0, y: -15, transition: { duration: 0.2 } }
   };
 
   const handleNavigate = (subViewId: string) => {
@@ -54,6 +58,14 @@ const DiscoveryView: React.FC = () => {
   // --- Manejadores para el estado de búsqueda --- //
   const handleOpenSearch = () => setIsSearching(true);
   const handleCloseSearch = () => setIsSearching(false);
+  
+  // ⚙️ Al cambiar de pestaña, se cierra la búsqueda si está abierta para una mejor UX.
+  const handleTabChange = (tab: 'discovery' | 'artifacts') => {
+    if (tab === 'artifacts' && isSearching) {
+      setIsSearching(false);
+    }
+    setActiveTab(tab);
+  };
 
   const renderSubView = () => {
     switch (activeSubView) {
@@ -74,60 +86,85 @@ const DiscoveryView: React.FC = () => {
         {activeSubView === null ? (
           <motion.div
             key="discovery-main"
-            className="relative w-full h-full flex-grow flex flex-col items-center justify-center p-4"
+            // 💡 Se elimina el título y se sube el contenido añadiendo padding superior.
+            className="relative w-full h-full flex-grow flex flex-col pt-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            <motion.nav 
-              className="absolute top-8 left-4 sm:left-8 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] max-w-lg"
-              variants={itemVariants}
-            >
-              <div className="relative flex items-start" style={{ height: '18rem' }}>
-                <AnimatePresence>
-                  {isSearching && (
-                    <motion.button
-                      key="back-from-search"
-                      // 🚀 ¡Implementación Fuerte de "Volver Atrás"! 🚀
-                      // Este botón es el único responsable de revertir el estado de búsqueda.
-                      // Su `onClick` invoca `handleCloseSearch`, que actualiza el estado en este
-                      // componente padre. Es la "única fuente de verdad".
-                      onClick={handleCloseSearch}
-                      className="absolute z-30 w-16 h-16 flex items-center justify-center rounded-full"
-                      aria-label="Cerrar búsqueda y volver"
-                      initial={{ opacity: 0, x: -20, scale: 0.8 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: -20, scale: 0.8 }}
-                      transition={{ ...springTransition, damping: 30 }}
-                      whileTap={tapAnimation}
-                      // 💡 Se añade `whileHover` para un feedback visual inmediato en desktop,
-                      // reforzando la interactividad del botón.
-                      whileHover={{ scale: 1.1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                    >
-                      <BackIcon className="w-8 h-8 text-white" />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+            {/* ⚙️ Contenedor de Controles (Switch y Barra de Búsqueda) */}
+            {/* 💡 Se elimina el margen superior para que se posicione más arriba. */}
+            <div className="w-full max-w-lg mx-auto px-4 sm:px-0">
+              <DiscoverySwitch activeTab={activeTab} onTabChange={handleTabChange} />
+              
+              <AnimatePresence>
+                {activeTab === 'discovery' && (
+                  <motion.div
+                    key="searchbar-container"
+                    // ⚙️ Centrado: Se añade flex y justify-center para centrar la barra.
+                    className="relative w-full flex justify-center"
+                    initial={{ opacity: 0, height: 0, marginTop: '0rem' }}
+                    // ⚙️ Separación mínima: Se reduce el margen superior a 0.5rem.
+                    animate={{ opacity: 1, height: '4rem', marginTop: '0.5rem' }}
+                    exit={{ opacity: 0, height: 0, marginTop: '0rem' }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <div className="absolute top-0 left-0 h-full flex items-center gap-2 z-30">
+                      <AnimatePresence>
+                        {isSearching && (
+                          <BackButton
+                            onClick={handleCloseSearch}
+                            ariaLabel="Cerrar búsqueda y volver"
+                          />
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    
+                    <SearchBar
+                      isSearching={isSearching}
+                      onOpen={handleOpenSearch}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            {/* ⚙️ Contenido de las Pestañas */}
+            <main className="w-full flex-grow flex flex-col items-center justify-center relative mt-4">
+              <AnimatePresence mode="wait">
+                {activeTab === 'discovery' ? (
+                  <motion.div
+                    key="discovery-content"
+                    className="flex flex-col items-center text-center"
+                    variants={tabContentVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <h2 className="text-2xl font-semibold text-white">Bienvenido a Discovery</h2>
+                    <p className="text-white/80 mt-2 max-w-md">
+                      Explora el contenido principal, busca lo que necesites y descubre nuevas funcionalidades.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="artifacts-content"
+                    className="flex flex-col items-center text-center"
+                    variants={tabContentVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                  >
+                    <ActionMenu onNavigate={handleNavigate} />
+                    <p className="text-white/80 mt-8 max-w-md">
+                      Gestiona tus artefactos y accede a acciones rápidas como el chat, consultoría o el blog.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </main>
 
-                <ActionMenu onNavigate={handleNavigate} isSearchActive={isSearching} />
-                <SearchBar 
-                  isSearching={isSearching}
-                  onOpen={handleOpenSearch}
-                />
-              </div>
-            </motion.nav>
-            <motion.div 
-              className="text-white dark:text-gray-100 text-center"
-              animate={{ opacity: isSearching ? 0 : 1, y: isSearching ? 20 : 0 }}
-              transition={{ ...springTransition, damping: 30, delay: isSearching ? 0 : 0.15 }}
-            >
-              <h1 className="text-5xl font-bold mb-4">Discovery</h1>
-              <p className="text-xl max-w-md">
-                Aquí es donde la exploración comienza. Descubre nuevo contenido,
-                perfiles interesantes y oportunidades únicas.
-              </p>
-            </motion.div>
           </motion.div>
         ) : (
           renderSubView()
