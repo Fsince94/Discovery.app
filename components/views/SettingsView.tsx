@@ -4,8 +4,10 @@ import { motion, type Variants, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 import ProfileView from './ProfileView';
 import ThemeSettingsView from './ThemeSettingsView';
-import SubViewLayout from '../layout/SubViewLayout'; // 💡 Se usa SubViewLayout
-import { useNavigation } from '../../context/NavigationContext'; // 💡 Importar hook de navegación
+import PaymentMethodsView from './PaymentMethodsView'; // 💡 Importar la nueva vista
+import SubViewLayout from '../layout/SubViewLayout';
+import { useNavigation } from '../../context/NavigationContext';
+import { PaymentIcon } from '../icons/PaymentIcon'; // 💡 Importar el nuevo icono
 
 const viewVariants: Variants = {
   hidden: { opacity: 0, scale: 0.95 },
@@ -44,6 +46,9 @@ const SettingsView: React.FC = () => {
         return <ProfileView key="user-profile" />;
       case 'theme':
         return <ThemeSettingsView key="theme" />;
+      // 💡 Añadir el caso para la nueva vista de métodos de pago.
+      case 'payment-methods':
+        return <PaymentMethodsView key="payment-methods" />;
       default:
         return null;
     }
@@ -68,12 +73,22 @@ const SettingsView: React.FC = () => {
     );
   };
 
-  // 💡 Se actualiza 'profile' a 'user-profile' para coincidir con `routes.ts`.
+  /**
+   * 🧩 Componente de previsualización para la tarjeta de métodos de pago.
+   *    Muestra un icono para dar una pista visual al usuario.
+   */
+  const PaymentPreviewCard: React.FC = () => (
+    <div className="w-full h-full bg-gray-200/50 dark:bg-gray-700/50 rounded-2xl flex items-center justify-center p-2 transition-colors duration-300">
+      <PaymentIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+    </div>
+  );
+
+  // 💡 Se sustituye 'data' por 'payment-methods' y se usa el nuevo componente de previsualización.
   const gridItems = [
     { id: 'theme', label: 'Tema', component: ThemePreviewCard },
     { id: 'user-profile', label: 'Perfil', component: PlaceholderCard },
     { id: 'security', label: 'Seguridad', component: PlaceholderCard },
-    { id: 'data', label: 'Datos', component: PlaceholderCard },
+    { id: 'payment-methods', label: 'Pagos', component: PaymentPreviewCard },
     { id: 'language', label: 'Idioma', component: PlaceholderCard },
     { id: 'help', label: 'Ayuda', component: PlaceholderCard },
     { id: 'about', label: 'Acerca de', component: PlaceholderCard },
@@ -81,7 +96,7 @@ const SettingsView: React.FC = () => {
     { id: 'legal', label: 'Legal', component: PlaceholderCard },
   ];
 
-  const isSubViewActive = ['user-profile', 'theme'].includes(currentView);
+  const isSubViewActive = ['user-profile', 'theme', 'payment-methods'].includes(currentView);
 
   return (
     <AnimatePresence mode="wait">
@@ -97,7 +112,8 @@ const SettingsView: React.FC = () => {
             exit="exit"
           >
             {gridItems.map((item) => {
-              const isClickable = item.id === 'user-profile' || item.id === 'theme';
+              // 💡 Se añade 'payment-methods' a los elementos clicables.
+              const isClickable = ['user-profile', 'theme', 'payment-methods'].includes(item.id);
               return (
                 <motion.div 
                   key={item.id} 

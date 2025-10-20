@@ -1,10 +1,12 @@
+
 import { RoutesMap } from '../types';
 import { ProfileBrainIcon } from '../components/icons/ProfileBrainIcon';
 import { SettingsIcon } from '../components/icons/SettingsIcon';
-import { BellIcon } from '../components/icons/BellIcon';
-import { BagIcon } from '../components/icons/BagIcon';
+import { LearnIcon } from '../components/icons/LearnIcon'; // 💡 Importar el nuevo icono
 import { TrashIcon } from '../components/icons/TrashIcon';
-
+import { PaymentIcon } from '../components/icons/PaymentIcon';
+import { WalletIcon } from '../components/icons/WalletIcon';
+import { CartIcon } from '../components/icons/CartIcon';
 
 /**
  * 🗺️ Mapa de Rutas de la Aplicación
@@ -21,17 +23,22 @@ export const routes: RoutesMap = {
   // 💡 FIX: Las vistas principales ahora tienen `parent: null` para ser consideradas raíces.
   'profile': { title: 'Discovery', parent: null, icon: ProfileBrainIcon },
   'settings': { title: 'Configuración', parent: null, icon: SettingsIcon },
-  'notifications': { title: 'Notificaciones', parent: null, icon: BellIcon },
-  'cart': { title: 'Carrito', parent: null, icon: BagIcon },
+  'learn': { title: 'Learn', parent: null, icon: LearnIcon }, // 💡 Se reemplaza Notificaciones por Learn
   'delete': { title: 'Eliminar', parent: null, icon: TrashIcon },
+  'wallet': { title: 'Billetera', parent: null, icon: WalletIcon },
 
   // --- Sub-vistas de Discovery ---
   // 💡 Estas SÍ son hijas de 'profile', por lo que su `parent` es correcto.
   'chat': { title: 'Chat', parent: 'profile' },
   'consulting': { title: 'Consultoría', parent: 'profile' },
   'blog': { title: 'Blog', parent: 'profile' },
+  
+  // 💡 Nueva ruta para el carrito de compras, ahora hija de 'wallet'.
+  'cart': { title: 'Carrito de Compras', parent: 'wallet', icon: CartIcon },
 
   // --- Sub-vistas de Configuración ---
   'user-profile': { title: 'Perfil', parent: 'settings' },
   'theme': { title: 'Tema', parent: 'settings' },
+  // 💡 Nueva ruta para los métodos de pago.
+  'payment-methods': { title: 'Métodos de Pago', parent: 'settings', icon: PaymentIcon },
 };

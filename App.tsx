@@ -4,6 +4,8 @@ import { AnimatePresence } from 'framer-motion';
 import BottomNavBar from './components/BottomNavBar';
 import DiscoveryView from './components/views/DiscoveryView';
 import SettingsView from './components/views/SettingsView';
+import WalletView from './components/views/WalletView';
+import LearnView from './components/views/LearnView'; // 💡 Importar la nueva vista de Learn
 import { useNavigation } from './context/NavigationContext';
 import SubViewLayout from './components/layout/SubViewLayout';
 
@@ -28,6 +30,10 @@ const App: React.FC = () => {
         return <DiscoveryView key="discovery" />;
       case 'settings':
         return <SettingsView key="settings" />;
+      case 'wallet':
+        return <WalletView key="wallet" />;
+      case 'learn': // 💡 Añadir el caso para la nueva vista Learn
+        return <LearnView key="learn" />;
       
       // 💡 Las sub-vistas que antes se manejaban localmente (como 'chat')
       //    ahora se renderizan en sus componentes padres (`DiscoveryView`, `SettingsView`).

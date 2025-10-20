@@ -1,7 +1,6 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 // FIX: Separated the `Variants` type import to resolve type resolution errors.
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import type { Variants, PanInfo } from 'framer-motion';
 import { DoubleChevronRightIcon } from '../icons/DoubleChevronRightIcon';
 import { useNavigation } from '../../context/NavigationContext'; // 💡 Importar el hook de navegación
@@ -35,12 +34,6 @@ interface SubViewLayoutProps {
  */
 const SubViewLayout: React.FC<SubViewLayoutProps> = ({ children }) => {
   const { breadcrumbs, goBack } = useNavigation();
-  const controls = useAnimation();
-
-  // ⚙️ Inicia la animación de entrada "visible" cuando el componente se monta.
-  useEffect(() => {
-    controls.start("visible");
-  }, [controls]);
 
   /**
    * ⚙️ Maneja el final del gesto de arrastre para la navegación hacia atrás.
@@ -54,10 +47,9 @@ const SubViewLayout: React.FC<SubViewLayoutProps> = ({ children }) => {
     if (info.offset.x > dragThreshold || info.velocity.x > velocityThreshold) {
       // La animación `exit` es manejada por AnimatePresence en el componente padre.
       goBack();
-    } else {
-      // 💡 Si no, la vista vuelve a su posición original con una animación de resorte.
-      controls.start({ x: 0, transition: { type: 'spring', stiffness: 300, damping: 30 } });
     }
+    // 💡 FIX: El "snap back" (volver a la posición original) es manejado automáticamente
+    // por Framer Motion cuando el gesto no cumple la condición. No es necesario un `else`.
   };
 
   return (
@@ -65,8 +57,8 @@ const SubViewLayout: React.FC<SubViewLayoutProps> = ({ children }) => {
       className="absolute inset-0 w-full h-full bg-gradient-to-br from-teal-300 to-cyan-400 dark:from-gray-800 dark:to-slate-900 flex flex-col z-10 transition-colors duration-500"
       variants={subViewVariants}
       initial="hidden"
-      // 💡 `animate` está vinculado a los controles para permitir el "snap back".
-      animate={controls}
+      // 💡 FIX: Se usa `animate="visible"` directamente. Se eliminó `useAnimation` para evitar conflictos.
+      animate="visible"
       exit="exit"
       // --- Propiedades para Gestos de Deslizamiento ---
       drag="x" // Habilita el arrastre en el eje horizontal.
@@ -74,8 +66,8 @@ const SubViewLayout: React.FC<SubViewLayoutProps> = ({ children }) => {
       dragElastic={{ right: 0.5, left: 0 }} // Resistencia elástica para una sensación más física.
       onDragEnd={handleDragEnd} // Llama a nuestra lógica cuando el gesto termina.
     >
-      {/* ⚙️ Cabecera con Breadcrumbs generados automáticamente */}
-      <header className="flex items-center pb-4 px-4 flex-shrink-0 text-white dark:text-gray-100">
+      {/* ⚙️ Cabecera con Breadcrumbs generados automáticamente y más espaciado. */}
+      <header className="flex items-center pt-6 pb-4 px-6 flex-shrink-0 text-white dark:text-gray-100">
         <div className="flex items-center gap-2 flex-wrap" role="navigation" aria-label="Breadcrumb">
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1;

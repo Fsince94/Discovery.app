@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { type NavItem } from '../types';
@@ -5,14 +6,14 @@ import { tapAnimation, springTransition } from '../utils/animations';
 import { useNavigation } from '../context/NavigationContext';
 
 import { ProfileBrainIcon } from './icons/ProfileBrainIcon';
-import { BellIcon } from './icons/BellIcon';
+import { LearnIcon } from './icons/LearnIcon'; // 💡 Importar el nuevo icono de Learn
 import { TrashIcon } from './icons/TrashIcon';
-import { BagIcon } from './icons/BagIcon';
 import { SettingsIcon } from './icons/SettingsIcon';
+import { WalletIcon } from './icons/WalletIcon';
 
 const navItems: NavItem[] = [
-  { id: 'notifications', label: 'Notificaciones', icon: BellIcon },
-  { id: 'cart', label: 'Carrito', icon: BagIcon },
+  { id: 'learn', label: 'Learn', icon: LearnIcon }, // 💡 Se reemplaza Notificaciones por Learn
+  { id: 'wallet', label: 'Billetera', icon: WalletIcon },
   { id: 'profile', label: 'Discovery', icon: ProfileBrainIcon },
   { id: 'delete', label: 'Eliminar', icon: TrashIcon },
   { id: 'settings', label: 'Configuración', icon: SettingsIcon },
@@ -71,7 +72,7 @@ const BottomNavBar: React.FC = () => {
                 </motion.div>
               </motion.button>
               
-              {isActive && item.id === 'profile' && (
+              {isActive && (item.id === 'profile' || item.id === 'wallet' || item.id === 'learn') && (
                 <motion.span
                   className="absolute bottom-1 text-xs font-bold text-teal-600 dark:text-teal-300"
                   initial={{ opacity: 0, y: '0.3125rem' }} 
